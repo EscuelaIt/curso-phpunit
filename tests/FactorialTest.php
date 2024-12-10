@@ -2,6 +2,7 @@
 namespace Tests;
 
 use App\Factorial;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class FactorialTest extends TestCase {
@@ -24,8 +25,9 @@ class FactorialTest extends TestCase {
     $this->assertEquals(1, $this->factorial->calculate(0));
   }
 
-  public function testFactorialOfNegativeNumber() {
-    $this->assertEquals(-1, $this->factorial->calculate(-5));
+  public function testFactorialOfNegativeNumberThrowException() {
+    $this->expectException(InvalidArgumentException::class);
+    $this->factorial->calculate(-5);
   }
 
   public function testFactorialOfTen() {

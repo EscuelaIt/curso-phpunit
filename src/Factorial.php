@@ -2,10 +2,12 @@
 
 namespace App;
 
+use InvalidArgumentException;
+
 class Factorial {
   public function calculate($input) {
     if($input < 0) {
-      return -1;
+      throw new InvalidArgumentException('No es posible hacer un factorial de números negativos');
     }
     if($input <= 1) {
       return 1;
