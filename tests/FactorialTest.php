@@ -1,5 +1,5 @@
 <?php
-namespace Test;
+namespace Tests;
 
 use App\Factorial;
 use PHPUnit\Framework\TestCase;
