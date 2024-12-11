@@ -18,8 +18,9 @@ class ReadTimeCalculator {
   
   public function getReadTimeInHours(): string {
       $minutes = $this->getReadTimeInMinutes();
-      $hours = intdiv($minutes, 60);
-      $remainingMinutes = $minutes % 60; 
-      return sprintf('%d:%02d', $hours, $remainingMinutes); // Formato h:mm
+      $timeCalculator = new TimeCalculator();
+      [$hours, $minutes] = $timeCalculator->convertMinutesToHoursAndMinutes($minutes);
+      return sprintf('%d:%02d', $hours, $minutes); // Formato h:mm
   }
+    
 }
