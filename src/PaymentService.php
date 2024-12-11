@@ -4,6 +4,6 @@ namespace App;
 
 interface PaymentService {
   
-  public function processPayment(float $quantity);
+  public function processPayment(float $quantity): bool;
   
 }

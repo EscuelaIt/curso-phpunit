@@ -5,6 +5,7 @@ namespace Tests;
 use Exception;
 use App\Product;
 use App\ShoppingCart;
+use App\PaymentService;
 use App\NotificationService;
 use PHPUnit\Framework\TestCase;
 use Tests\Doubles\FakePaymentService;
@@ -15,7 +16,9 @@ class ShoppingCartTest extends TestCase {
   protected $cart;
 
   protected function setUp(): void {
-    $paymentService = new FakePaymentService();
+    // $paymentService = new FakePaymentService();
+    $paymentService = $this->createStub(PaymentService::class);
+    $paymentService->method('processPayment')->willReturn(true);
     $notificationService = $this->createMock(NotificationService::class);
     $this->cart = new ShoppingCart($paymentService, $notificationService);
     $this->cart->addProduct( new Product('Ratón ergonómico', 80));
@@ -23,7 +26,8 @@ class ShoppingCartTest extends TestCase {
   }
 
   private function createEmptyShoppingCart() {
-    $paymentService = new FakePaymentService();
+    // $paymentService = new FakePaymentService();
+    $paymentService = $this->createStub(PaymentService::class);
     $notificationService = $this->createMock(NotificationService::class);
     $this->cart = new ShoppingCart($paymentService, $notificationService);
   }
