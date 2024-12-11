@@ -1,0 +1,25 @@
+@startuml
+title Diseño con dobles: ShoppingCart y PaymentService
+
+interface PaymentService {
+    +processPayment(value: float): bool
+}
+
+class RealPaymentService {
+    +processPayment(value: float): bool
+}
+
+class FakePaymentService {
+    +processPayment(value: float): bool
+}
+
+class ShoppingCart {
+    -paymentService: PaymentService
+    +__construct(paymentService: PaymentService)
+    +checkout(): bool
+}
+
+ShoppingCart --> PaymentService : utiliza
+PaymentService <|-- RealPaymentService
+PaymentService <|-- FakePaymentService
+@enduml

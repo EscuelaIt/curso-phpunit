@@ -5,86 +5,87 @@ namespace Tests;
 use Exception;
 use App\Product;
 use App\ShoppingCart;
+use App\NotificationService;
 use PHPUnit\Framework\TestCase;
+use Tests\Doubles\FakePaymentService;
 use PHPUnit\Framework\Attributes\Test;
 
 class ShoppingCartTest extends TestCase {
   
+  protected $cart;
+
+  protected function setUp(): void {
+    $paymentService = new FakePaymentService();
+    $notificationService = $this->createMock(NotificationService::class);
+    $this->cart = new ShoppingCart($paymentService, $notificationService);
+    $this->cart->addProduct( new Product('Ratón ergonómico', 80));
+    $this->cart->addProduct( new Product('Teclado inalámbrico', 105));
+  }
+
+  private function createEmptyShoppingCart() {
+    $paymentService = new FakePaymentService();
+    $notificationService = $this->createMock(NotificationService::class);
+    $this->cart = new ShoppingCart($paymentService, $notificationService);
+  }
+
   #[Test]
   public function emptyCartReturnsFalseOnHasProducts() {
-    $cart = new ShoppingCart();
-    $this->assertFalse($cart->hasProducts());
+    $this->createEmptyShoppingCart();
+    $this->assertFalse($this->cart->hasProducts());
   }
 
   #[Test]
   public function notEmptyCartReturnsTrueOnHasProducts() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $this->assertTrue($cart->hasProducts());
+    $this->assertTrue($this->cart->hasProducts());
   }
-  
-  // #[Test]
-  // public function cartHasAnArrayOfProducts() {
-  //   $cart = new ShoppingCart();
-  //   $this->assertIsArray($cart->getProducts());
-  // }
   
   #[Test]
   public function cartHasAnEmptyArrayOfProducts() {
-    $cart = new ShoppingCart();
-    $this->assertIsArray($cart->getProducts());
-    $this->assertEmpty($cart->getProducts());
+    $this->createEmptyShoppingCart();
+    $this->assertIsArray($this->cart->getProducts());
+    $this->assertEmpty($this->cart->getProducts());
   }
 
   #[Test]
   public function cartHasCorrectNumberOfProducs() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $cart->addProduct( new Product('Teclado inalámbrico', 105));
-    $this->assertCount(2, $cart->getProducts());
+    $this->assertCount(2, $this->cart->getProducts());
   }
 
   #[Test]
   public function cartHasAnAddedProduct() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $cart->addProduct( new Product('Teclado inalámbrico', 105));
     $screen = new Product('Pantalla 4K', 250);
-    $cart->addProduct($screen);
-    $this->assertCount(3, $cart->getProducts());
-    $this->assertContains($screen, $cart->getProducts());
+    $this->cart->addProduct($screen);
+    $this->assertCount(3, $this->cart->getProducts());
+    $this->assertContains($screen, $this->cart->getProducts());
   }
 
   #[Test]
   public function cartHasNotAnAddedProduct() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $cart->addProduct( new Product('Teclado inalámbrico', 105));
     $screen = new Product('Pantalla 4K', 250);
-    $cart->addProduct($screen);
-    $cart->removeProduct($screen);
-    $this->assertCount(2, $cart->getProducts());
-    $this->assertNotContains($screen, $cart->getProducts());
+    $this->cart->addProduct($screen);
+    $this->cart->removeProduct($screen);
+    $this->assertCount(2, $this->cart->getProducts());
+    $this->assertNotContains($screen, $this->cart->getProducts());
   }
 
   #[Test]
   public function cartHasOnlyProducts() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $cart->addProduct( new Product('Teclado inalámbrico', 105));
     $screen = new Product('Pantalla 4K', 250);
-    $cart->addProduct($screen);
-    $this->assertContainsOnlyInstancesOf(Product::class, $cart->getProducts());
+    $this->cart->addProduct($screen);
+    $this->assertContainsOnlyInstancesOf(Product::class, $this->cart->getProducts());
   }
 
   #[Test]
   public function removeProductThatIsNotInCartThrowsException() {
-    $cart = new ShoppingCart();
-    $cart->addProduct( new Product('Ratón ergonómico', 80));
-    $cart->addProduct( new Product('Teclado inalámbrico', 105));
     $screen = new Product('Pantalla 4K', 250);
     $this->expectException(Exception::class);
     $this->expectExceptionMessage('El producto no está en el carrito');
-    $cart->removeProduct($screen);
+    $this->cart->removeProduct($screen);
+  }
+
+  #[Test]
+  public function checkoutMarkCartAsPaid() {
+    $this->cart->checkout();
+    $this->assertTrue($this->cart->isPaid());
   }
 }
