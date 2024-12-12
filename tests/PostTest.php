@@ -4,6 +4,7 @@ namespace Tests;
 
 use PDO;
 use App\Post;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -57,5 +58,15 @@ class PostTest extends TestCase {
   public function unexistendPostReturnsNull() {
     $retrievedPost = $this->postModel->findById(1);
     $this->assertNull($retrievedPost);
+  }
+
+  #[Test]
+  public function titleLargerThan100CharsThrowsException() {
+    $title = 'Primer Post de un título que es muy largo. Primer Post de un título que es muy largo Primer Post de un título que es muy largoPrimer Post de un título que es muy largo';
+    $content = 'Este es el contenido de mi primer post';
+
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage("El título no puede exceder los 100 caracteres");
+    $this->postModel->create($title, $content);
   }
 }

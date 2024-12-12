@@ -1,0 +1,3 @@
+# Validaciones en el modelo
+
+Ver capítulo de excepciones...

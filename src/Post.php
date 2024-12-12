@@ -3,6 +3,7 @@
 namespace App;
 
 use PDO;
+use InvalidArgumentException;
 
 class Post {
 
@@ -14,6 +15,10 @@ class Post {
   }
 
   public function create($title, $content) {
+    if (strlen($title) > 100) {
+      throw new InvalidArgumentException("El título no puede exceder los 100 caracteres");
+    }
+
     $sql = "INSERT INTO posts (title, content) VALUES (:title, :content)";
     $stmt = $this->db->prepare($sql);
     $stmt->bindParam(':title', $title);
