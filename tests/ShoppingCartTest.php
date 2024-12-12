@@ -14,13 +14,14 @@ use PHPUnit\Framework\Attributes\Test;
 class ShoppingCartTest extends TestCase {
   
   protected $cart;
+  protected $notificationService;
 
   protected function setUp(): void {
     // $paymentService = new FakePaymentService();
     $paymentService = $this->createStub(PaymentService::class);
     $paymentService->method('processPayment')->willReturn(true);
-    $notificationService = $this->createMock(NotificationService::class);
-    $this->cart = new ShoppingCart($paymentService, $notificationService);
+    $this->notificationService = $this->createMock(NotificationService::class);
+    $this->cart = new ShoppingCart($paymentService, $this->notificationService);
     $this->cart->addProduct( new Product('Ratón ergonómico', 80));
     $this->cart->addProduct( new Product('Teclado inalámbrico', 105));
   }
@@ -92,4 +93,23 @@ class ShoppingCartTest extends TestCase {
     $this->cart->checkout();
     $this->assertTrue($this->cart->isPaid());
   }
+
+  #[Test]
+  public function cartCheckoutSendsConfirmationToAdministrator() {
+    $this->notificationService
+      ->expects($this->once())
+      ->method('sendEmail')
+      ->with($this->callback(function($arg) {
+        // verificaciones de los argumentos $arg devolviendo un boleano
+        return $this->verifyNotificationArguments($arg);
+      }));
+    $this->cart->checkout();
+  }
+
+  private function verifyNotificationArguments($arg) {
+    return isset($arg['to'], $arg['content'])
+          && preg_match('/@example\.com$/', $arg['to'])
+          && $arg['content'] === 'Se ha completado el pago de un nuevo pedido';
+  }
+  
 }

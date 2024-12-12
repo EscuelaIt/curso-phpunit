@@ -47,7 +47,10 @@ class ShoppingCart {
   public function checkout() {
     if($this->paymentService->processPayment($this->getPriceSummatory())) {
       $this->paid = true;
-      $this->notificationService->sendEmail('admin@example.com', 'Se ha completado el pago de un nuevo pedido');
+      $this->notificationService->sendEmail([
+        'to' => 'admin@example.com', 
+        'content' => 'Se ha completado el pago de un nuevo pedido'
+      ]);
     }
   }
 
