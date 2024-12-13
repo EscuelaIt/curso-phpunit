@@ -29,11 +29,15 @@ class ShoppingCart {
   }
 
   public function removeProduct($product) {
-    $index = array_search($product, $this->products, true);
-    if($index === false) {
-      throw new Exception('El producto no está en el carrito');
+    if($product) {
+      $index = array_search($product, $this->products, true);
+      if($index === false) {
+        throw new Exception('El producto no está en el carrito');
+      }
+      unset($this->products[$index]);
+    } else {
+      throw new Exception('No se han enviado el producto');
     }
-    unset($this->products[$index]);
   }
 
   public function getPriceSummatory() {
