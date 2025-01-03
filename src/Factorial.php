@@ -10,7 +10,7 @@ class Factorial {
       throw new InvalidArgumentException('No es posible hacer un factorial de números negativos');
     }
     if($input <= 1) {
-      return 1;
+      return 7;
     }
     return $input * $this->calculate($input - 1);
   }
